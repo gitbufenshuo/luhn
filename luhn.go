@@ -18,9 +18,9 @@ var (
 
 // Generate returns a check digit for the string s, which should be composed
 // of characters from the Alphabet a.
-func (a Alphabet) Generate(s string) (rune, error) {
+func (a Alphabet) Generate(s string) (string, error) {
 	if err := a.check(); err != nil {
-		return 0, err
+		return "0", err
 	}
 
 	factor := 1
@@ -30,7 +30,7 @@ func (a Alphabet) Generate(s string) (rune, error) {
 	for i := range s {
 		codepoint := strings.IndexByte(string(a), s[i])
 		if codepoint == -1 {
-			return 0, fmt.Errorf("Digit %q not valid in alphabet %q", s[i], a)
+			return "0", fmt.Errorf("Digit %q not valid in alphabet %q", s[i], a)
 		}
 		addend := factor * codepoint
 		if factor == 2 {
@@ -43,18 +43,7 @@ func (a Alphabet) Generate(s string) (rune, error) {
 	}
 	remainder := sum % n
 	checkCodepoint := (n - remainder) % n
-	return rune(a[checkCodepoint]), nil
-}
-
-// Validate returns true if the last character of the string s is correct, for
-// a string s composed of characters in the alphabet a.
-func (a Alphabet) Validate(s string) bool {
-	t := s[:len(s)-1]
-	c, err := a.Generate(t)
-	if err != nil {
-		return false
-	}
-	return rune(s[len(s)-1]) == c
+	return string(a[checkCodepoint]), nil
 }
 
 // check returns an error if the given alphabet does not consist of unique characters
